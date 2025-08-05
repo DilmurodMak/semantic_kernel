@@ -1,1 +1,4 @@
-Generate a greeting for the user {{$name}} in a very kind manner. The greeting should include the age {{$age}} of the user as well alongwith the name.
+Create a warm and personalized greeting for {{$name}}, who is {{$age}} years old. 
+The greeting should be friendly, welcoming, and naturally incorporate both their name and age in a conversational way. 
+Make it feel genuine and appropriate for their age group.
+Add Signature from AI with quote from an AI 
