@@ -4,9 +4,15 @@ import sys
 import time
 from typing import Annotated
 import math
-from semantic_kernel.connectors.ai.function_choice_behavior import FunctionChoiceBehavior
-from semantic_kernel.connectors.ai.open_ai.services.open_ai_chat_completion import OpenAIChatCompletion
-from semantic_kernel.connectors.ai.prompt_execution_settings import PromptExecutionSettings
+from semantic_kernel.connectors.ai.function_choice_behavior import (
+    FunctionChoiceBehavior,
+)
+from semantic_kernel.connectors.ai.open_ai.services.open_ai_chat_completion import (
+    OpenAIChatCompletion,
+)
+from semantic_kernel.connectors.ai.prompt_execution_settings import (
+    PromptExecutionSettings,
+)
 from semantic_kernel.functions.kernel_arguments import KernelArguments
 from semantic_kernel.functions.kernel_function_decorator import kernel_function
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
@@ -24,14 +30,20 @@ def set_up_logging():
     handler = logging.StreamHandler(sys.stdout)
     handler.setLevel(logging.INFO)
     handler.setFormatter(
-        logging.Formatter("[%(asctime)s.%(msecs)03d %(levelname)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S"),
+        logging.Formatter(
+            "[%(asctime)s.%(msecs)03d %(levelname)s] %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        ),
     )
     # Print only the logs from the chat completion client to reduce the output of the sample
-    handler.addFilter(lambda record: record.name == "semantic_kernel.connectors.ai.chat_completion_client_base")
+    handler.addFilter(
+        lambda record: record.name
+        == "semantic_kernel.connectors.ai.chat_completion_client_base"
+    )
 
     root_logger.addHandler(handler)
-    
-    
+
+
 class Math:
     """
     Description: MathPlugin provides a set of functions to make Math calculations.
@@ -98,32 +110,31 @@ class Math:
         return float(number1) - float(number2)
 
 
-
 async def parallel_execution():
     kernel = Kernel()
     load_dotenv()
 
     service_id = "default"
     kernel.add_service(
-        AzureChatCompletion(service_id=service_id,
-                            api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-                            deployment_name=os.getenv("AZURE_OPENAI_CHAT_COMPLETION_MODEL"),
-                            endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+        AzureChatCompletion(
+            service_id=service_id,
+            api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+            deployment_name=os.getenv("AZURE_OPENAI_CHAT_COMPLETION_MODEL"),
+            endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
         )
     )
-    
+
     kernel.add_plugin(Math(), "MathPlugin")
 
-    plugin = kernel.add_plugin(parent_directory="../plugins/prompt_templates/", plugin_name="basic_plugin")
+    plugin = kernel.add_plugin(
+        parent_directory="../plugins/prompt_templates/", plugin_name="basic_plugin"
+    )
 
     contact_function = plugin["greeting"]
-    
-    #query which will execute in parallel
+
+    # query which will execute in parallel
     query1 = "greet kuljot who is of age 19 and tell me how much is 10 divided by 2"
-    
-    
-    
-    
+
     arguments = KernelArguments(
         settings=PromptExecutionSettings(
             # Set the function_choice_behavior to auto to let the model
@@ -132,55 +143,52 @@ async def parallel_execution():
             function_choice_behavior=FunctionChoiceBehavior.Auto(),
         )
     )
-    
-    
-    
+
     result = await kernel.invoke_prompt(query1, arguments=arguments)
     print(result)
 
-   
-    
-    
+
 async def sequential_execution():
     kernel = Kernel()
     load_dotenv()
 
     service_id = "default"
     kernel.add_service(
-        AzureChatCompletion(service_id=service_id,
-                            api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-                            deployment_name=os.getenv("AZURE_OPENAI_CHAT_COMPLETION_MODEL"),
-                            endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+        AzureChatCompletion(
+            service_id=service_id,
+            api_key=os.getenv("AZURE_AI_FOUNDRY_API_KEY"),
+            deployment_name=os.getenv("AZURE_AI_FOUNDRY_DEPLOYMENT"),
+            endpoint=os.getenv("AZURE_AI_FOUNDRY_ENDPOINT"),
+            api_version=os.getenv("AZURE_AI_FOUNDRY_API_VERSION"),
         )
     )
-    
+
     kernel.add_plugin(Math(), "MathPlugin")
 
-    plugin = kernel.add_plugin(parent_directory="../plugins/prompt_templates/", plugin_name="basic_plugin")
+    plugin = kernel.add_plugin(
+        parent_directory="../plugins/prompt_templates/", plugin_name="basic_plugin"
+    )
 
     contact_function = plugin["greeting"]
-    
-    #query which will execute in sequence
+
+    # query which will execute in sequence
     query1 = "greet kuljot who is of age 19 and tell me how much is 10 divided by 2"
-    
-    planner = SequentialPlanner(
-    kernel,
-    service_id
-    )
-    
+
+    planner = SequentialPlanner(kernel, service_id)
+
     sequential_plan = await planner.create_plan(query1)
-    
+
     print("The plan's steps are:")
     for step in sequential_plan._steps:
         print(
             f"- {step.description.replace('.', '') if step.description else 'No description'} using {step.metadata.fully_qualified_name} with parameters: {step.parameters}"
         )
-    
+
     result = await sequential_plan.invoke(kernel)
-    
+
     print(result)
-    
-   
+
+
 if __name__ == "__main__":
     set_up_logging()
 

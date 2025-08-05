@@ -13,14 +13,19 @@ service_id = "default"
 kernel.add_service(
     AzureChatCompletion(
         service_id=service_id,
-        api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-        deployment_name=os.getenv("AZURE_OPENAI_CHAT_COMPLETION_MODEL"),
-        endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        api_key=os.getenv("AZURE_AI_FOUNDRY_API_KEY"),
+        deployment_name=os.getenv("AZURE_AI_FOUNDRY_DEPLOYMENT"),
+        endpoint=os.getenv("AZURE_AI_FOUNDRY_ENDPOINT"),
+        api_version=os.getenv("AZURE_AI_FOUNDRY_API_VERSION"),
     )
 )
 
+plugin_path = os.path.join(
+    os.path.dirname(__file__), "..", "plugins", "prompt_templates"
+)
 plugin = kernel.add_plugin(
-    parent_directory="../plugins/prompt_templates/", plugin_name="basic_plugin"
+    parent_directory=plugin_path,
+    plugin_name="basic_plugin"
 )
 
 greeting_function = plugin["greeting"]
