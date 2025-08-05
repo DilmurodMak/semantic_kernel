@@ -13,9 +13,9 @@ service_id = "default"
 kernel.add_service(
     AzureChatCompletion(
         service_id=service_id,
-        api_key=os.getenv("AZURE_AI_FOUNDRY_API_KEY"),
+        api_key=os.getenv("AZURE_OPENAI_API_KEY"),
         deployment_name=os.getenv("AZURE_AI_FOUNDRY_DEPLOYMENT"),
-        endpoint=os.getenv("AZURE_AI_FOUNDRY_ENDPOINT"),
+        endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
         api_version=os.getenv("AZURE_AI_FOUNDRY_API_VERSION"),
     )
 )
