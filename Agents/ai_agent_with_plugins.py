@@ -7,8 +7,7 @@ from azure.ai.agents.models import (
     OpenApiTool,
     OpenApiAnonymousAuthDetails,
     CodeInterpreterTool,
-    ToolSet,
-    MessageRole
+    ToolSet
 )
 from dotenv import load_dotenv
 from pathlib import Path
