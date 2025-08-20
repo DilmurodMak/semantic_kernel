@@ -14,9 +14,32 @@ from azure.ai.projects import AIProjectClient
 from azure.identity import DefaultAzureCredential
 from azure.monitor.opentelemetry import configure_azure_monitor
 from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import (
+    SimpleSpanProcessor,
+    ConsoleSpanExporter
+)
 
 # Load environment variables
 load_dotenv()
+
+
+def setup_console_tracing():
+    """Set up console tracing for development and debugging."""
+    span_exporter = ConsoleSpanExporter()
+    tracer_provider = TracerProvider()
+    tracer_provider.add_span_processor(SimpleSpanProcessor(span_exporter))
+    trace.set_tracer_provider(tracer_provider)
+    print("✅ Console tracing enabled - spans will be printed to console")
+
+
+# Check if console tracing is requested via environment variable
+console_tracing_enabled = (
+    os.getenv("ENABLE_CONSOLE_TRACING", "false").lower() == "true"
+)
+if console_tracing_enabled:
+    setup_console_tracing()
+
 tracer = trace.get_tracer(__name__)
 
 
@@ -104,6 +127,13 @@ def main():
 @tracer.start_as_current_span("build_prompt_with_context")
 def build_prompt_with_context(claim: str, context: str) -> list:
     """Build a prompt for assessing claims with context."""
+    # Get current span and add attributes
+    current_span = trace.get_current_span()
+    if current_span.is_recording():
+        current_span.set_attribute("claim", claim[:200])  # Show more of claim
+        current_span.set_attribute("context", context[:300])  # Show context
+        current_span.set_attribute("context_length", len(context))
+    
     system_message = (
         "I will ask you to assess whether a particular scientific claim, "
         "based on evidence provided. Output only the text 'True' if the "
@@ -133,9 +163,18 @@ Assessment:
 @tracer.start_as_current_span("assess_single_claim")
 def assess_single_claim(claim: str, context: str, client) -> str:
     """Assess a single claim with its context."""
+    # Get current span and add attributes
+    current_span = trace.get_current_span()
+    if current_span.is_recording():
+        current_span.set_attribute("claim", claim[:200])
+        current_span.set_attribute("context", context[:300])
+        current_span.set_attribute("context_length", len(context))
+        current_span.set_attribute("model", "gpt-4o")
+    
     with tracer.start_as_current_span("assess_single_claim_details") as span:
         span.set_attribute("claim", claim[:100])  # Truncate for safety
         span.set_attribute("context_length", len(context))
+        span.set_attribute("context_preview", context[:150])
         
         response = client.chat.completions.create(
             model="gpt-4o",
@@ -150,14 +189,23 @@ def assess_single_claim(claim: str, context: str, client) -> str:
 @tracer.start_as_current_span("assess_claims_with_context")
 def assess_claims_with_context(claims, contexts, client):
     """Assess multiple claims with their corresponding contexts."""
+    # Get current span and add attributes
+    current_span = trace.get_current_span()
+    if current_span.is_recording():
+        current_span.set_attribute("total_claims", len(claims))
+        current_span.set_attribute("claims_preview", str(claims)[:500])
+        
     responses = []
     for i, (claim, context) in enumerate(zip(claims, contexts)):
         with tracer.start_as_current_span(f"claim_assessment_{i}") as span:
             span.set_attribute("claim_index", i)
             span.set_attribute("total_claims", len(claims))
+            span.set_attribute("current_claim", claim[:150])
+            span.set_attribute("current_context", context[:200])
             
             result = assess_single_claim(claim, context, client)
             responses.append(result)
+            span.set_attribute("assessment_result", result)
 
     return responses
 
