@@ -1,0 +1,13 @@
+{"question": "Which sales orders are not from the United States?", "expected_answer": "The orders not from the United States are SO43661 and SO43662, which are both from Canada."}
+{"question": "What is the total sales amount for Sales Order SO43661?", "expected_answer": "Sales Order SO43661 has a total sales amount of 32726.49."}
+{"question": "What is the total sales amount for Sales Order SO43662?", "expected_answer": "Sales Order SO43662 has a total sales amount of 28832.53."}
+{"question": "What is the total sales amount for Sales Order SO43665?", "expected_answer": "Sales Order SO43665 has a total sales amount of 14352.76."}
+{"question": "Which sales order has the highest total sales amount?", "expected_answer": "Among the provided orders, SO43661 has the highest total sales amount at 32726.49."}
+{"question": "How many distinct product categories appear in Sales Order SO43661?", "expected_answer": "There are 4 distinct product categories in SO43661: Components, Bikes, Clothing, and Accessories."}
+{"question": "How many order lines are there in Sales Order SO43662?", "expected_answer": "Sales Order SO43662 contains 22 order lines in total."}
+{"question": "What is the total order quantity in Sales Order SO43665?", "expected_answer": "The total order quantity for SO43665 is 20 units."}
+{"question": "List the distinct reseller names across the attached sales orders.", "expected_answer": "The distinct reseller names are Original Bicycle Supply Company; Health Spa, Limited; and Latest Sports Equipment."}
+{"question": "What are the earliest order date and latest ship date across the attached sales orders?", "expected_answer": "Across the provided orders, the earliest order date is 2017-07-05 00:00:00 and the latest ship date is 2017-07-14 00:00:00."}
+{"question": "In Sales Order SO43661, what is the sales amount for line 'SO43661 - 11' (Mountain-100 Black, 42)?", "expected_answer": "In SO43661, the sales amount for line 'SO43661 - 11' (Mountain-100 Black, 42) is 8099.98."}
+{"question": "In Sales Order SO43665, what is the sales amount for 'Mountain Bike Socks, M'?", "expected_answer": "In SO43665, the sales amount for 'Mountain Bike Socks, M' is 34.2."}
+{"question": "In Sales Order SO43662, what is the sales amount for 'Road-450 Red, 58'?", "expected_answer": "In SO43662, the sales amount for 'Road-450 Red, 58' is 3499.18."}
